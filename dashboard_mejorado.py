@@ -12,6 +12,10 @@ st.set_page_config(page_title="Dashboard de Ventas", layout="wide")
 df = pd.read_csv("data.csv")
 df['Date'] = pd.to_datetime(df['Date'])
 
+# Mostrar datos
+if st.sidebar.checkbox("Mostrar Base de datos"):
+    st.dataframe(df)
+
 # Título general
 st.title("📊 Dashboard de Ventas - Análisis Exploratorio")
 
@@ -41,6 +45,37 @@ analisis = st.sidebar.selectbox(
         "Ingreso Bruto por Sucursal y Línea"
     ]
 )
+##########################################
+# Filtros adicionales
+st.sidebar.markdown("### Filtros adicionales")
+
+# Filtro por línea de producto
+lineas = df['Product line'].unique()
+linea_seleccionada = st.sidebar.multiselect("Filtrar por línea de producto", options=lineas, default=lineas)
+
+# Filtro por tipo de cliente
+tipos_cliente = df['Customer type'].unique()
+tipo_cliente_seleccionado = st.sidebar.multiselect("Filtrar por tipo de cliente", options=tipos_cliente, default=tipos_cliente)
+
+# Filtro por método de pago
+metodos_pago = df['Payment'].unique()
+metodo_pago_seleccionado = st.sidebar.multiselect("Filtrar por método de pago", options=metodos_pago, default=metodos_pago)
+
+# # Filtro por rango de fechas
+# min_fecha = df['Date'].min()
+# max_fecha = df['Date'].max()
+# rango_fechas = st.sidebar.date_input("Filtrar por rango de fechas", [min_fecha, max_fecha], min_value=min_fecha, max_value=max_fecha)
+
+# Aplicar filtros seleccionados
+df = df[
+    (df['Product line'].isin(linea_seleccionada)) &
+    (df['Customer type'].isin(tipo_cliente_seleccionado)) &
+    (df['Payment'].isin(metodo_pago_seleccionado)) 
+    # (df['Date'] >= pd.to_datetime(rango_fechas[0])) &
+    # (df['Date'] <= pd.to_datetime(rango_fechas[1]))
+]
+
+#####################################
 
 # Análisis 1
 if analisis == "Evolución de Ventas Totales":
